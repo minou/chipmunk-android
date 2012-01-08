@@ -1,9 +1,15 @@
 from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
-from Cython.Build import cythonize
 
 CHIPMUNK_LIBNAME = "chipmunk"
+
+ext_modules = [
+    Extension('chipmunk.chipmunk', ['chipmunk/chipmunk.pyx'], libraries = [CHIPMUNK_LIBNAME]),
+    Extension("chipmunk.body", ['chipmunk/body.pyx'], libraries = [CHIPMUNK_LIBNAME]),
+    Extension('chipmunk.shape', ['chipmunk/shape.pyx'], libraries = [CHIPMUNK_LIBNAME]),
+    Extension('chipmunk.space', ['chipmunk/space.pyx'], libraries = [CHIPMUNK_LIBNAME]),
+]
 
 setup(
     name = "chipmunk-android",
@@ -11,5 +17,5 @@ setup(
     author = "Nicolas Niemczycki",
     author_email="niemczycki.nicolas@gmail.com",
     cmdclass = {'build_ext': build_ext},
-    ext_modules = cythonize(Extension('chipmunk', ['chipmunk/chipmunk.pyx', 'chipmunk/body.pyx', 'chipmunk/shape.pyx', 'chipmunk/space.pyx'], libraries = [CHIPMUNK_LIBNAME]))
+    ext_modules = ext_modules,
 )

@@ -1,3 +1,5 @@
+from chipmunk cimport *
+
 cdef class Body:
     def __cinit__(self, float m = 1, float i = 1, int autocreate = 1):
         self.automanaged = autocreate

@@ -1,3 +1,7 @@
+from chipmunk cimport *
+from body cimport Body
+from shape cimport Shape
+
 cdef class Space:
     def __cinit__(self, int iterations = 10):
         self._space = cpSpaceNew()
@@ -11,8 +15,10 @@ cdef class Space:
         #self._post_step_callbacks = {}
         self._shapes = []
         self._static_shapes = []
-        self._bodies = set()
-        self._constraints = set()
+        self._bodies = []
+        self._constraints = []
+        #self._bodies = set()
+        #self._constraints = set()
     
     def __dealloc__(self):
         self._static_body = None

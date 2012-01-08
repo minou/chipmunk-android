@@ -1,3 +1,5 @@
+from chipmunk cimport *
+
 cdef class Shape:
     def __cinit__(self):
         self._shape = NULL
