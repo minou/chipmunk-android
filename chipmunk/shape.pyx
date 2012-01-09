@@ -1,4 +1,5 @@
 from chipmunk cimport *
+from body cimport Body
 
 cdef class Shape:
     def __cinit__(self):
@@ -46,7 +47,7 @@ cdef class Shape:
     surface_velocity = property(_get_surface_velocity, _set_surface_velocity)
 
     body = property(lambda self: self._body)
-    
+
     def cache_bb(self):
         return cpShapeCacheBB(self._shape)
 
@@ -54,15 +55,97 @@ cdef class Shape:
         return cpShapePointQuery(self._shape, cpv(p.x, p.y))
 
     def segment_query(self, start, end):
-        cpdef cpSegmentQueryInfo* info
+        cdef cpSegmentQueryInfo* info
         if cpShapeSegmentQuery(self._shape, cpv(start.x, start.y), cpv(end.x, end.y), info):
             return SegmentQueryInfo(self, start, end, info.t, info.n)
         else:
             return None
 
 
-class SegmentQueryInfo(object):
-    def __init__(self, shape, start, end, t, n):
+cdef class Circle(Shape):
+    def __cinit__(self, Body body, cpFloat radius, offset = (0, 0)):
+        self._body = body
+        self._shape = cpCircleShapeNew(body._body, radius, cpv(offset.x, offset.y))
+        #self._cs = ct.cast(self._shape, ct.POINTER(cp.cpCircleShape))
+
+    def unsafe_set_radius(self, r):
+        cpCircleShapeSetRadius(self._shape, r)
+
+    #def _get_radius(self):
+    #    return cpCircleShapeGetRadius(self._shape)
+    #radius = property(_get_radius)
+
+    def unsafe_set_offset(self, o):
+        cpCircleShapeSetOffset(self._shape, cpv(o.x, o.y))
+
+    #def _get_offset (self):
+    #    return cp.cpCircleShapeGetOffset(self._shape)
+    #offset = property(_get_offset)
+
+
+cdef class Segment(Shape):
+    def __cinit__(self, Body body, a, b, cpFloat radius):
+        self._body = body
+        self._shape = cpSegmentShapeNew(body._body, cpv(a.x, a.y), cpv(b.x, b.y), radius)
+        #self._segment_shape.shape = self._shape
+
+    def _set_a(self, a):
+        self._segment_shape.a = cpv(a.x, a.y)
+    def _get_a(self):
+        return self._segment_shape.a
+    a = property(_get_a, _set_a)
+
+    #def _set_b(self, b):
+    #    ct.cast(self._shape, ct.POINTER(cp.cpSegmentShape)).contents.b = b
+    #def _get_b(self):
+    #    return ct.cast(self._shape, ct.POINTER(cp.cpSegmentShape)).contents.b
+    #b = property(_get_b, _set_b)
+
+    #def _set_radius(self, r):
+    #    ct.cast(self._shape, ct.POINTER(cp.cpSegmentShape)).contents.r = r
+    #def _get_radius(self):
+    #    return ct.cast(self._shape, ct.POINTER(cp.cpSegmentShape)).contents.r
+    #radius = property(_get_radius, _set_radius)
+
+
+cdef class Poly(Shape):
+    def __cinit__(self, body, vertices, offset=(0, 0), auto_order_vertices=True):
+        self._body = body
+        self.offset = offset
+        #self.verts = (Vec2d * len(vertices))
+        #self.verts = self.verts(Vec2d(0, 0))
+ 
+        i_vs = enumerate(vertices)
+        #if auto_order_vertices and not u.is_clockwise(vertices):
+        #    i_vs = zip(range(len(vertices)-1, -1, -1), vertices)
+ 
+        for (i, vertex) in i_vs:
+            self.verts[i].x = vertex[0]
+            self.verts[i].y = vertex[1]
+
+        #self._shape = cpPolyShapeNew(body._body, len(vertices), self.verts, offset)
+
+
+    #@staticmethod
+    #def create_box(body, size=(10,10)):
+    #    x,y = size[0]*.5,size[1]*.5
+    #    vs = [(-x,-y),(-x,y),(x,y),(x,-y)]
+    #    return Poly(body,vs)
+
+    #def get_points(self):
+    #    points = []
+    #    rv = self._body.rotation_vector
+    #    bp = self._body.position
+    #    vs = self.verts
+    #    o = self.offset
+    #    for i in range(len(vs)):
+    #        p = (vs[i]+o).cpvrotate(rv)+bp
+    #        points.append(Vec2d(p))
+    #    return points
+
+
+cdef class SegmentQueryInfo:
+    def __cinit__(self, shape, start, end, t, n):
         self._shape = shape
         self._t = t
         self._n = n

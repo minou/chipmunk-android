@@ -16,6 +16,8 @@ cdef extern from "chipmunk/chipmunk.h":
         cpFloat l, b, r ,t
     cpVect cpv(cpFloat x, cpFloat y)
 
+    ctypedef unsigned int cpTimestamp
+
 
     ctypedef struct cpBody:
         # Mass of the body
@@ -76,3 +78,59 @@ cdef extern from "chipmunk/chipmunk.h":
         cpFloat t
         # The normal of the surface hit
         cpVect n
+
+    ctypedef struct cpContactPointSet:
+        # The number of contact points in the set
+        int count
+        # The position of the contact point
+        cpVect point
+        # The normal of the contact point
+        cpVect normal
+        # The depth of the contact point
+        cpFloat dist
+        # The array of contact points
+        #points[4]
+
+    ctypedef struct cpBB:
+        cpFloat l, b, r, t
+
+    ctypedef struct cpArbiter:
+        # Calculated value to use for the elasticity coefficient
+        cpFloat e
+        # Calculated value to use for the friction coefficient
+        cpFloat u
+        # Calculated value to use for applying surface velocities
+        cpVect surface_vr
+
+        #cpTimestamp stamp
+
+    cpFloat cpMomentForCircle(cpFloat m, cpFloat r1, cpFloat r2, cpVect offset)
+    cpFloat cpMomentForSegment(cpFloat m, cpVect a, cpVect b)
+    cpFloat cpMomentForPoly(cpFloat m, int numVerts, cpVect *verts, cpVect offset)
+    cpFloat cpMomentForBox(cpFloat m, cpFloat width, cpFloat height)
+    void cpResetShapeIdCounter()
+
+    #cpBB cpBB()
+    #cpBB cpBBNew(cpFloat l, cpFloat b, cpFloat r, cpFloat t)
+    cpBool cpBBIntersects(cpBB a, cpBB b)
+    cpBool cpBBContainsBB(cpBB bb, cpBB other)
+    cpBool cpBBContainsVect(cpBB bb, cpVect v)
+    #cpBB cpBBMerge(cpBB a, cpBB b)
+    #cpBB cpBBExpand(cpBB bb, cpVect v)
+    cpVect cpBBClampVect(cpBB bb, cpVect v)
+    cpVect cpBBWrapVect(cpBB bb, cpVect v)
+
+
+    cpContactPointSet cpArbiterGetContactPointSet(cpArbiter *arb)
+    void cpArbiterGetShapes(cpArbiter *arb, cpShape **a, cpShape **b)
+    cpVect cpArbiterTotalImpulse(cpArbiter *arb)
+    cpVect cpArbiterTotalImpulseWithFriction(cpArbiter *arb)
+    cpBool cpArbiterIsFirstContact(cpArbiter *arb)
+
+
+cdef class BB:
+    cdef cpBB* _bb
+
+
+cdef class Arbiter:
+    cdef cpArbiter* _arbiter

@@ -1,10 +1,12 @@
 from chipmunk cimport *
 
 cdef class Body:
-    def __cinit__(self, float m = 1, float i = 1, int autocreate = 1):
-        self.automanaged = autocreate
-        if self.automanaged:
-            self._body = cpBodyNew(m, i)
+    def __cinit__(self, float mass = None, float moment = None):
+        if mass == None and moment == None:
+            self._body = cpBodyNewStatic()
+        else:
+            self._body = cpBodyNew(mass, moment)
+            self.automanaged = 1
         #self._position_callback = None
         #self._velocity_callback = None
     
@@ -110,10 +112,9 @@ cdef class Body:
     def apply_force(self, f, r=(0, 0)):
         cpBodyApplyForce(self._body, cpv(f.x, f.y), cpv(r.x, r.y))
 
-    #
-    # apply_damped_spring
-    #
-
+    #def apply_damped_spring(self, b, anchor1, anchor2, rlen, k, dmp, dt):
+    #    cpApplyDampedSpring(self._body, b._body, anchor1, anchor2, rlen, k, dmp, dt)
+    
     def activate(self):
         cpBodyActivate(self._body)
         

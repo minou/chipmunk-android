@@ -3,6 +3,7 @@ from chipmunk cimport *
 cdef extern from "chipmunk/chipmunk.h":
     cpBody *cpBodyAlloc()
     cpBody *cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
+    cpBody* cpBodyNewStatic()
     cpBody *cpBodyNew(cpFloat m, cpFloat i)
 
     void cpBodyDestroy(cpBody *body)
@@ -18,8 +19,8 @@ cdef extern from "chipmunk/chipmunk.h":
     void cpBodyResetForces(cpBody *body)
     void cpBodyApplyForce(cpBody *body, cpVect f, cpVect r)
 
-    #typedef void (*cpBodyVelocityFunc)(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
-    #cpBodyVelocityFunc velocity_func
+    ctypedef void (*cpBodyVelocityFunc)(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
+    cpBodyVelocityFunc velocity_func
 
     void cpBodyActivate(cpBody *body)
     void cpBodySleep(cpBody *body)
